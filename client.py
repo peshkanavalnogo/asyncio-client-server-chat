@@ -35,6 +35,7 @@ async def get_username(reader, writer):
     return username
 
 async def main(root):
+    global writer
     reader, writer = await asyncio.open_connection('127.0.0.1', 8888)
     tkmain = asyncio.ensure_future(tk_main(root))
 
@@ -58,11 +59,25 @@ async def main(root):
         writer.close()
         await writer.wait_closed()
 
+def click():
+    asyncio.create_task(send())
+
+async def send():
+    message = n.get()
+    await send_message(writer, message)
+    n.set("")
+
 
 
 if __name__ == "__main__":
     root = tk.Tk()
     root.geometry("600x400")
+    n = tk.StringVar()
     text_box = scrolledtext.ScrolledText(root,wrap=tk.WORD, width=25, height=13)
+    send_entry = tk.Entry(root, textvariable=n)
+    buttn = tk.Button(root, command=click)
+    send_entry.grid(row = 10, column=1)
+    buttn.grid(row=11, column=1)
+
     text_box.grid(row=4, column=1)
     asyncio.run(main(root))

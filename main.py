@@ -54,8 +54,34 @@ class ChatServer:
         elif message.startswith("/leave"):
             room_name = message.split()[1]
             await self.left_room(username, room_name, writer)
+        elif message.startswith("/pm"):
+            tmp = message.split()
+            usernamee = ''
+            mes = ''
+            print(tmp)
+            for i in tmp:
+                if i != "/pm":
+                    usernamee = i
+                    break
+            n = 0
+            for i in tmp:
+                n += 1
+                if n > 2:
+                    mes += i + " "
+            await self.send_pm(usernamee, mes, writer)
+
+
         else:
             await self.broadcast(f"{username}: {message}", writer)
+
+    async def send_pm(self, username, message, writer):
+        for _, client_writer, usernamemb in self.clients:
+            print(usernamemb)
+            if str(usernamemb) == str(username):
+                print("succ")
+                await self.send_message(client_writer, f"pm from {username}: " + message)
+                break
+            
 
     async def left_room(self, username, room_name, writer):
         if room_name not in self.rooms:
