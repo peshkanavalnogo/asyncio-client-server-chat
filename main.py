@@ -23,6 +23,8 @@ class ChatServer:
 
         # Send a welcome message to the new client
         await self.send_message(writer, f"Welcome, {username}!")
+        await asyncio.sleep(0,1)
+        await self.send_message(writer, "/pm to pm, /rooms - list of rooms, /join to join room, /leave to leave room")
 
         try:
             while True:
@@ -51,6 +53,12 @@ class ChatServer:
         if message.startswith("/join"):
             room_name = message.split()[1]
             await self.join_room(username, room_name, writer)
+        elif message.startswith("/rooms"):
+            message = ''
+            for i in self.rooms.keys():
+                i += " "
+                message += i
+            await self.send_message(writer, message)
         elif message.startswith("/leave"):
             room_name = message.split()[1]
             await self.left_room(username, room_name, writer)
@@ -72,6 +80,7 @@ class ChatServer:
 
 
         else:
+            print('starting broadcast')
             await self.broadcast(f"{username}: {message}", writer)
 
     async def send_pm(self, username, message, writer):
